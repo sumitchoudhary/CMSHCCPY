@@ -1,0 +1,1972 @@
+alright I'm recording it so I have Luke in the room this is Daniel and the purpose of this ScreenFlow recording is
+      
+    
+to go through SAS code for the CMS HCC algorithm and explain it in full so that
+      
+    
+I myself Daniel if I key to look at this in a few months and I haven't touched a scale in a while can read the two
+      
+    
+purposes here a kind of a mini tutorial on SAS and all its interesting foibles
+      
+    
+and II did I say a word 1a a tutorial on SAS and be a walkthrough of every last
+      
+    
+line of code in here because I'm going to need to translate this into Python for now eventually our the idea is to
+      
+    
+expose the algorithm and let the language be determined later by someone else so Luke feel free to interrupt and
+      
+    
+ask any questions in fact I want you to I want you to say what is this exactly and feeling so for me when I approach
+      
+    
+this I didn't feel comfortable I sort of understood the large brush strokes yeah but I didn't feel comfortable just sort
+      
+    
+of ignoring large bits of syntax here because they could be especially with an ancient language like SAS they could
+      
+    
+have extreme consequences because there is some sort of random meaning that I was missing so it is actually turns out
+      
+    
+very simple and you'll probably be you'll probably say yeah that's it it's just that simple but for me I didn't feel comfortable until I could you know
+      
+    
+pick a random a little bit of syntax like especially like right here which is insane and understand every last token
+      
+    
+every last lexical implication there so there's a couple things that I want to
+      
+    
+do is be good for this is a one I'd like to tease out a little bit of how the
+      
+    
+right way to interface with this is hmm so yeah when you say the right way to
+      
+    
+interface with this as in the algorithm well like if I were an analyst and I
+      
+    
+want to use our package why is our packaging besides not being incest our package should have features that make
+      
+    
+it easier to use for different purposes sure and at the very very base there our
+      
+    
+package will have basic names that make sense yeah so for instance SAS coming from a legacy of like the 1960's and
+      
+    
+1970's has limitations to the size of variables and things like that so you see some odd naming conventions some
+      
+    
+really idiosyncratic functions that do certain types of things right here this is this is quite what
+      
+    
+essentially just to kind of jump way ahead right now that line is a dictionary lookup that's all it is
+      
+    
+it took me a long time to figure that out but that's all it is this is the crosswalk yeah what's happening here is here's your
+      
+    
+diagnosis and here is your here is your code category yeah and it does this
+      
+    
+there is some sort of weird usage of what are called formats I have a I have it's actually explained right here table
+      
+    
+lookup there are a lot of different ways to do table lookup and SAS they actually have sequel they have merge statements
+      
+    
+but what they're using here what CMS is using here is this format procedure and input function and what we'll find often
+      
+    
+is it seems like CMS purposefully chose to do the older way of doing sass there
+      
+    
+are a lot of things in here that newer versions of sass sass version 9.3 have more modern ideas they actually have
+      
+    
+things like hash tables or they have better arrays but this code uses like
+      
+    
+the older way of doing it I suspect because there's a huge install base of sass code that's not the most recent
+      
+    
+yeah I mean sass licenses with sass platforms that are not the most recent as another example here's a random bit
+      
+    
+of syntax right here array okay I looked at that and I want to make sure I understood every single like I said
+      
+    
+idiosyncratic lexical meaning here so I picked up a an article on arrays and and
+      
+    
+it none of it looks familiar until I got to because the way they describe arrays is it looks like this and that's doesn't
+      
+    
+match but then if you can scroll down and you get to page six they say expose it's implicit subscripting and
+      
+    
+apparently implicit is a it's a cryptic way of doing it but it's an old way of doing it so this is the old way of doing
+      
+    
+it and of course I say of course kind of snidely this code uses that technique okay so top-level here there are a lot
+      
+    
+of there are a lot of different pieces of sass files that all together compose
+      
+    
+the code there is a when CMS printed this out they actually included a PDF that explained everything it's called
+      
+    
+HCC software version 2 whatever it's very good it explains every single thing in it what every single file means and
+      
+    
+what its contained in every single file and then it has sort of like the overall algorithm which is very useful in and I
+      
+    
+will say this for as much as the SAS code is crappy it's because it's SAS I think people who
+      
+    
+actually wrote this did probably as good of a job as he could possibly do with SAS so I think they were excellent programmers you good SAS itself is just
+      
+    
+goodness gracious pain so some some key first statements about SAS a there are
+      
+    
+only two data types numeric and in char and that has implications here
+      
+    
+it's an old way of doing things it's gonna it we're gonna see coercion of variables into ones and zeros to be true
+      
+    
+and false and that's a huge thing in here that's because we only have numeric we have no boolean type in this in this
+      
+    
+programming language that's a big thing another thing is there are really only two high level abstractions in SAS
+      
+    
+something called a data step and then something called a proc step the bulk of
+      
+    
+this code exists in what's called a data step so if you see here data starts on 169 and it goes down to I've written
+      
+    
+five annotate up another piece of paper so I know exactly where those it goes all the way down to 439 so right there
+      
+    
+that run statement is the thing that is kind of like the do end or the end squiggly bracket beginnings green
+      
+    
+squiggly bracket so what we're in right now is a file called v2 11:6 h1 m dot
+      
+    
+SAS it's really kind of the heart of the entire program but you'd be where you start running it is this one which is
+      
+    
+called V 21 16 H 1 P dot SAS and all it is is a wrapper ultimately around a
+      
+    
+macro call to this so let me actually return to what I was saying so SAS numeric char that's one thing to know it
+      
+    
+to data and proc steps and every and that's basically all the SAS it's a whole bunch of data steps and then maybe
+      
+    
+a couple proc steps three there is no sense of abstraction in in the sense of
+      
+    
+creating user-defined functions like in Python you say death create a function R you can do the same thing see you can do
+      
+    
+the same thing SAS comes from such an old legacy that in order to do that they don't you have
+      
+    
+to use what I call the macros the macro is literally a textual substitution of some code that you want to use again and
+      
+    
+again and again so whenever you see this we never you see a percentage that's a macro call what this is this point is
+      
+    
+saying I'm calling the macro called wet and it's defining some macros I don't have time to get into too much of the details here but basically
+      
+    
+as your eyes get used to looking at this code anytime you see two different types of characters you know you're dealing with macros a percentage sign and an
+      
+    
+ampersand sign a percentage sign is like calling a macro function and a ampersand
+      
+    
+is kind of dereferencing it so whenever it when I see this for instance I see ampersand that thing right there hccb to
+      
+    
+one list 87 that means before the code is even compiled that's going to be expanded out into some text and where is
+      
+    
+this thing to find well this thing is defined right there so literally it's as if we were to take this code here all
+      
+    
+these characters right here and take this right here and replace it by but not to get in like that so that is what
+      
+    
+a macro does not referencing an array it's actually just representing a string that's exactly that is not an array well
+      
+    
+you can conceptually treat it as array but it's not you can't you can't access the index whatever it literally copies
+      
+    
+and pastes that right there so any time you see an ampersand imagine you copying and pasting that's actually what happens before it gets compiled all those
+      
+    
+ampersands are dereferenced and exploded right so that that is I'm familiar with
+      
+    
+macros and they you there the problem with macros is they it's they created a separation between language and mental
+      
+    
+language macros are a meta language they are language about the language and this used to be the way people did
+      
+    
+abstraction and some really old types of languages unfortunately it's it's not the best here you can't create user-defined functions unless you use
+      
+    
+macros so there are a lot of idiosyncrasies in here and so this is a macro call so again there are two
+      
+    
+different types of macros let me be explicit with that macros that are defined with this ledge can can be
+      
+    
+dereferenced with this ampersand right here there's another way of defining a macro and that's kind of like a function
+      
+    
+macro and those start like this percentage sign macro and then the name of the macro and then they have a at the
+      
+    
+very end they have a percentage MN for macro and those types of macros let's
+      
+    
+call them function macros you call by invoking make a percentage sign and then the name of the macro right there
+      
+    
+so this v2 11:6 h 1m can only be call because someone defined the macro v2
+      
+    
+11:6 1h @ 6h 1 now what this does is it
+      
+    
+literally includes the location in 0 right here is the location of the file where the
+      
+    
+directory in which so this is some weird syntax this includes says in this directory in 0 and then they have a
+      
+    
+parenthesis look for this file slash source 2 I believe means it I actually
+      
+    
+is not a divide sign it's there's a lot of weird syntax that's specifically hard-coded into SAS
+      
+    
+I believe it's saying treat it as source when I include it and don't try to pre-process it okay I think that's what
+      
+    
+it means there I say I understand this 99% that's when the and a lot of this
+      
+    
+was I was sure these thing in some of these things I didn't dive too deep into but I'm sure that's what it is okay yeah so again even though v2 11:6 h 1p SAS is
+      
+    
+the main line it's essentially look at all this from here to right here it's
+      
+    
+just comments and then we're we're setting some certain variables and then we call the main function and I put that
+      
+    
+it in scare quotes because it's a macro and this is it and this main function is the guts of the program every other
+      
+    
+macro is called from here and as I mentioned before all of sass is a intermingling of data steps in proc
+      
+    
+steps and literally this program is 98% data step because that the very end
+      
+    
+here's the end of the data skip your proc step is literally just printed out because the end the end result is a
+      
+    
+table right okay so understanding the data step is critical to understanding SAS it every SAS tutorial you read says
+      
+    
+says that same thing and when people talk about the power of SAS and how powerful and wonderful it is what
+      
+    
+they're really talking about is X is actually a bunch of pre-written proc steps that allow you to do statistics but it's the data steps that allow you
+      
+    
+to pull in data from some some other location and it's also this data step that there's a lot of weird weird old
+      
+    
+legacy stuff going on here so a data step step starts like this dia the name right here is is the name
+      
+    
+of the output data set and that's unfortunately took me a while to figure out so this is a macro right here out
+      
+    
+data well where did we get out data if you scroll up you can see that it came in as a parameter well that was a third parameter we passed in how data is equal
+      
+    
+to out to I actually code in this I set this yeah I said this I said this and I
+      
+    
+set this so what I'm saying is there is a library called out libraries just a directory where we're
+      
+    
+data files go and you can see right up here and live name out and this is the locations the directory is gonna be so
+      
+    
+I'm saying this is creating a permanent what is called a permanent data set data
+      
+    
+set is a very specific thing in SAS a data set is just a table but it's a SAS specific format so you know even though
+      
+    
+the phrase data set sounds informal yeah it is a very specific thing in SAS it's
+      
+    
+literally it's literally a format of data columns rows and some sort of metadata that's including formats which
+      
+    
+again a format has a very specific formal meaning under the SAS programming language so right here data what we're defining
+      
+    
+is the output location for all this data keep-keep are not explained it for now
+      
+    
+so here is probably the most important statement about data the data step this
+      
+    
+data is ism is like an implicit for loop okay so when you write a for loop in any
+      
+    
+other language you're saying iterate over something and then you indent it yeah and all the stuff inside that code
+      
+    
+block is what you do every single time so this is like for out data do exactly
+      
+    
+so everything from line 170 down to line 438 is like the block of a for loop okay
+      
+    
+great yeah it we saw the same thing with awk remember when we ran off and we gave it those patterns yeah we were implicitly
+      
+    
+those blocks of code we're running on every single line and this is because SAS comes from a heritage of your
+      
+    
+streaming data through here right it is in every line of which input that's
+      
+    
+exactly what made me tear my hair out where the hell is the input there is no very easy way to say what is the input
+      
+    
+most SAS uses something called a set you would actually literally write something like this set and then you give it a
+      
+    
+live game dot whatever and that would say that would become our input in this case our input is right here merge the
+      
+    
+two anon files yep on the ID variable yes so there are multiple there are multiple reserved
+      
+    
+words key words that explicitly you slash implicitly create the input
+      
+    
+upon which this data step loose merge is one of them merge allows us to set two
+      
+    
+different data files together here's another one there's the set remember I was saying I
+      
+    
+want to understand every single line here this is this is also a data set in Co F is the is a is a library HCC - is a
+      
+    
+permanent data set I don't quite get why this is a reserved word underscore n but
+      
+    
+it basically says if this is our first time through this implicit loop then do this and what are we doing we're setting
+      
+    
+set is basically like what's my input so actually there are three inputs here
+      
+    
+there is there is this one there is this one that are getting merge together and there is this one but for some reason
+      
+    
+this one well actually there it's always going to be fixed this one right it
+      
+    
+doesn't get iterated for some reason okay whereas these get iterated okay so
+      
+    
+I mentioned to you before the CMS HCC SAS code tends to the older level code
+      
+    
+and you can see that here merge by ID bar is an older way of doing it
+      
+    
+the you'll notice over here when they explain what kind of code you want to
+      
+    
+when they explain the code and how you want to and how you want to use it they explode áown here and say file supplied
+      
+    
+by a user - SAS input files need for the software must be pre sorted in ascending order that's key
+      
+    
+I had to pre sort these things I had to make sure that if patient ID one was in
+      
+    
+the beneficiary file first before patient ID three then in the diagnosis
+      
+    
+file that same sort order was was present why because this merge requires it and this shows you a little bit of
+      
+    
+the heritage of of the old ways of doing things by requiring that these two files
+      
+    
+be pre-sorted merge is it is very is very much doing a joint like a relational sequel joint so in fact there
+      
+    
+are there is a there is a croc in SAS that allows you to embed sequel and we could have done it using that but I
+      
+    
+believe CMS says Oh some people don't have version whatever 5.3 in which proc sequel is introduced you
+      
+    
+so rather than requiring people to upgrade they have this old way of doing it so you have to pre sort the data so
+      
+    
+that this this merge can occur okay and so what's actually happening here is this macro ampersand InP that comes from
+      
+    
+right here which is the very first thing we passed in which was in 1 2010 been a
+      
+    
+which is like a which is the beneficiary file in D which is he means patient D
+      
+    
+means diagnosis so there you go those things become back in the merge statement down here those things become
+      
+    
+are expanded out and literally what's written here is in 1.9 or scaler to 2010
+      
+    
+or something like that that's important thing to realize but you notice this in one right here that's not the same thing as this one right
+      
+    
+here which took me a long time to figure out so this syntax right here is a
+      
+    
+special way of indicating to yourself whether there's anything present or not so if we're joining two files and we're
+      
+    
+joining them by ID VAR it's possible one of them doesn't exist on the left you know left outer joins and right outer
+      
+    
+joins yeah so this is sacis way of saying if N 1 is equal to 1 then it's present if N 1
+      
+    
+is equal to 0 it's not present if in2 is equal to 1 that record the right hand record is present then 2 is equal to 0
+      
+    
+it's not present so that's what that means so then you see right here line 216 line 216 goes all the way down to
+      
+    
+438 which is almost the entire data step so this line right here is protecting us
+      
+    
+and saying if in 1 so it's basically saying if I have a beneficiary then do this if not do nothing ok so this is a
+      
+    
+little bit of a protection you see if you could do it in Python code easy enough that's what that means so that
+      
+    
+makes sense that that's protecting us against there being a diagnosis with a patient ID who's not in the beneficiary
+      
+    
+file right ok now so everything as I was mentioning here before everything here
+      
+    
+is it implicitly in a loop of this beneficiary there's almost there
+      
+    
+there is always just one beneficiary row and therefore there are multiple diagnoses roles so so we're going to be
+      
+    
+iterating over multiple diagnoses across multiple beneficiaries ok
+      
+    
+so they do a pretty good job here explaining here there are three kinds of things that go on here there is the first record we do some initialization
+      
+    
+this is step three for just this is only occurs for the first record then there's
+      
+    
+stuff that only occurs for the last record this goes down to right here so
+      
+    
+this block of code it only occurs for the last record and then this stuff here step three five occurs for each
+      
+    
+diagnosis it's just weird because it's like normally you just have a for loop
+      
+    
+the for loop abandoned move on yes it's like you where when we get to the last record do everything else here yes
+      
+    
+because the way the data set works is these are the foibles of an old programming language that is has a
+      
+    
+heritage in COBOL yes this the data step is is different and I I've read a lot of
+      
+    
+papers on it and almost every single paper that anyone writes on SAS begins with the phrase the so-and-so feature of
+      
+    
+SAS is a very misunderstood but extremely powerful feature sure it's they all start that way and they all are
+      
+    
+powerful but I would argue that every Turing complete language is powerful yes so there's a lot of there's a lot of
+      
+    
+Stockholm Syndrome on when you read it well all these academic papers on how to do powerful things and SAS so let me
+      
+    
+repeat here step 3 for this is this is done for the first for the first record
+      
+    
+of that beneficiary this is done for every record of the beneficiary every
+      
+    
+record not just the first not not the ones that are neither the first or the last but every record and this one is
+      
+    
+only done for the last record okay so a couple more syntax things right here
+      
+    
+length basically anytime you reference a variable and it's on the left hand side of an equal anywhere in this code for
+      
+    
+instance like right here it will be implicitly put as the output so there's there there are dozens of different ways
+      
+    
+to say things are in the output this is the main one so this says keep everything that keep bar is actually a a
+      
+    
+mixture of hick of these plus these macros plus these macros and that's because in the repend what we're really
+      
+    
+printing out is per record per I'm sorry per patient we're printing out like a hundred now like 300 columns and these
+      
+    
+are here these are the patient ID these been quick variables the input variables are like age date of birth that kind of
+      
+    
+stuff score variables the three scores you get the community institutional and
+      
+    
+new enrollee demographic variables which age bucket they're in and it's not it's not it's not that they print out one
+      
+    
+they literally print out every single age bucket here every single one and
+      
+    
+they put a 1 to indicate that you're in it in a zero to CN okay if you're not right which is odd but it also makes sense
+      
+    
+because what they're doing from a scoring perspectives creating a linear regression function which is literally
+      
+    
+every single one of these things these demographic variables and if it's a zero then it adds nothing to it right if it's
+      
+    
+a one it adds what it's so much easier to that's what made it so easy to take the raw output and rerun a regression
+      
+    
+yes yes I just had to you had to add a new coefficient that was it there's real
+      
+    
+in your eyes yep I I needed to go through this code and verify that for myself but that's absolutely all it's done but that is exactly what's going on
+      
+    
+and I'll get into more details with that later on so there back to the point
+      
+    
+though what is output into the data set into this data set is a combination of what's in this key bar and anything
+      
+    
+that's implicitly here so you have a statement like this unfortunately as I mentioned to you before SAS only has two
+      
+    
+different types numeric HR but it also it also limits them again heritage of
+      
+    
+COBOL Co call the year 2000 crap that's because back in those days people only
+      
+    
+set aside 2 bytes for the two numbers of the year they didn't cite set aside for most modern programming languages and
+      
+    
+integers and integer can be in fit right in SAS as an older language you actually have to explicitly say kind of like in
+      
+    
+some databases this is a character that can only be four characters long this is a string that can be only four
+      
+    
+characters long so that's what's going on here we're saying lengths category whenever you see the dollar sign that means we're dealing with a chart type so
+      
+    
+what we're saying here is all of these things are an alternation of the variable followed by a format so in this
+      
+    
+case the variable is CC which is code category and our format is it's a character for long the dot is just
+      
+    
+needed there in the case of a numeric the dot means it doesn't have a digit following after it but it's just always
+      
+    
+their age F no dollar sign there means this is a numeric and has three digits right because no one is
+      
+    
+more than 999 years old but there are occasional people who are 105 years old right now the dot indicates if there
+      
+    
+were two here it would indicate that there are two things after the digit but they're not right like three - yeah okay
+      
+    
+did all of these are continue to be variables and all of these have this
+      
+    
+format assigned to them okay and then occasionally you have things like this right here which creates a range so from
+      
+    
+HCC one to HCC what well that is that is
+      
+    
+a macro that gets expanded well we're where is that macro come from that macro comes from 201 so literally that 201
+      
+    
+right there gets substituted in right there before compile time boom and this
+      
+    
+- implicitly creates an HTC one and HTC two and HTC three all the way to 201 so
+      
+    
+you see that a lot there's there's a mixture meta language and language simultaneously it's it's kind of difficult to read okay so these are this
+      
+    
+is basically saying these variables that I know are gonna be in my output here are the format's I associated with them okay okay
+      
+    
+retain is a special keyword implicitly if the data is coming in from an outside
+      
+    
+from input right here it's retained automatically as we go through the for loop we still have the old one present
+      
+    
+for one iteration so that we can do we can add it to a total a growing total
+      
+    
+will create an average or something like that yeah in the in the case of a variable that doesn't come from the input like this CC 1 through CC 2
+      
+    
+whatever it was 200 201 we have created these variables but right here we created these variables and we gave them
+      
+    
+a numeric but they didn't come from the input therefore we have to explicitly retain them so that each time we go through the for loop they are not
+      
+    
+reinitialized so but we retain them in the very first time we use them we set them to 0
+      
+    
+that's all this that's all this means we're also retaining this variable age F because why because each time we hit a
+      
+    
+new beneficiary we want to we calculate the age at the very beginning and then as we look through the diagnosis we
+      
+    
+still need that so that's what this retain does and then we have arrays we have two types of arrays we have the CC
+      
+    
+array which is code category and we have the HCC which is the hierarchical code code categories this is this took me a long time to
+      
+    
+figure out we're declaring the existence of an array that you can index by a
+      
+    
+numeric but the actual values you can then say you can then say use these to
+      
+    
+get at it so that's why these things exist here this is that let me switch over here this is that implicit Perret
+      
+    
+explicit versus implicit subscript a so we're saying array our array name is see
+      
+    
+over here our index variable is
+      
+    
+something that ranges to 201 and then our initial array elements I'm sorry our
+      
+    
+array elements our CC 1 through CC 201 and this allows us to reference them by
+      
+    
+going c c c 2 c c3 c parentheses CC 2 it's interesting it's Nev n't seen it
+      
+    
+done before but what why when I first was trying to understand how this retained thing worked it didn't make any sense how it
+      
+    
+was retaining because it looked like to me we're retaining this and yet C was the thing we wanted to retain yeah but
+      
+    
+but it works backwards because we're retaining these elements the C is implicitly retained
+      
+    
+each time through so it's like both of lists and additionally yes that is
+      
+    
+correct it's gonna sack system by position exactly exactly
+      
+    
+but but the important thing for this yeah the important thing for this is because I have retained these through
+      
+    
+each step yeah I retain the entire work array yeah okay which is very critical
+      
+    
+for what's happening in that net for loop yeah okay so let's just start here but what's the meat of the what's going
+      
+    
+on here the very first time through the very first time this is a the first time we run into a new beneficiary that's
+      
+    
+what Hickman ID bar is a macro that is the forth one here which is pick no so
+      
+    
+that is the patient ID so when we first see that right there zero out the code categories it's the
+      
+    
+first time okay and calculate that person's age easy enough this is crazy stuff but we understand what it's doing
+      
+    
+it's based on the date of birth and based on when we're running this it calculates the age this is the very first thing so basically set all the
+      
+    
+code categories to zero from here to here is what we do on every single line
+      
+    
+and that's all it's doing is saying okay what's the diagnosis get its code category so that's everything here so if
+      
+    
+the diagnosis type is in icd-9 then do this if it's an icd-10 then do this and
+      
+    
+if you look at the difference between these two things they're almost exactly alike except this says edit Mac 9 and
+      
+    
+this says edit Mac 0 this says FM 9 FM
+      
+    
+name 9 that says FM 9 0 this says I 9 this is i0 but otherwise there they are
+      
+    
+the exact same block the diak type right
+      
+    
+here whereas a diet i'p comes from here
+      
+    
+it's it specifically comes from here the input diagnosis so if you look over here yeah when we were asked to feed in two
+      
+    
+files we had a fecal up fill in person file which has hick no sex date of birth Medicaid and M Cato rec and diagnosis
+      
+    
+which has hick no Dayak and diag type it has to have duct tape so that diag type
+      
+    
+is is very explicitly a column in a dataset again the formal definition of a
+      
+    
+SAS data set yeah before even using this remember this is my this is my diagnosis data set I actually had to create that
+      
+    
+from text yeah so if we were open up this right over here let me pull up a
+      
+    
+beneficiary oh that's the beneficiary file here is a diagnosis you will see it literally features diag underscore type
+      
+    
+that is that is the name of the column that's the metadata associated with a formal SAS data set so yes so again this
+      
+    
+if block and this if block are really essentially the same except one is for icd-9 once for icd-10 they could have
+      
+    
+had a macro creating a macro but that gets really really complicated so I appreciate that they didn't try to get too clever here so that if it's if it's
+      
+    
+icd-9 so here's all what's going on right first so as we go through every
+      
+    
+single diagnosis for a beneficiary we're going to we're going to do two things we're gonna edit
+      
+    
+and then we are going to look up the look up the category based on the
+      
+    
+diagnosis just two things again yeah edit and then look up the category and
+      
+    
+edit kind of looks up the category so but the heart of it is right here is looking up the the code category based
+      
+    
+on the diagnosis and this is what I was telling you before this monstrosity right here is a dictionary lookup that's
+      
+    
+really all it is it took me a long time to figure that out I could show you the details of it but essentially put
+      
+    
+coerces put is used math so this we're saying right here dollar sign I 9
+      
+    
+followed by this macro the reason there are two dots is just forget about it and
+      
+    
+this meant it took it took me a while to figure out that why there are two dots essentially this second dot means end of
+      
+    
+a format this first knot has to be there to protect this macro from seeing that second time so this fm9 is actually this right here
+      
+    
+why  one fly RC so if we go back down here that is literally substituted
+      
+    
+in for here and then this entire thing is what's called a format which is an
+      
+    
+external file that the the documentation indicates is stored is has been created
+      
+    
+in a what is called a format transport file yeah and that we have to load in this is the name of that format try a transfer file it's an external binary
+      
+    
+SAS specific transport file that contains all these formats in them so something about this macro is so the
+      
+    
+biggest thing with ICD codes is there a variable length ring because there's optional elements at the end
+      
+    
+associated icd-10 and there's a period usually that but you cannot have the
+      
+    
+period and immediately derive where it is so it's not usually critical to have it right so an icd-10 code that's only three digits the period is last it's
+      
+    
+always the fourth character right same and that's actually the same guys data right so when you port this so like some
+      
+    
+question will be do you want to specify the format the ICD code should be in and enforce it or specify what it should be
+      
+    
+and then have be able to fix it fit necessary Mike my read on this is we
+      
+    
+specify the format in what I've seen them show I'll show you right here is icd-10 codes are
+      
+    
+always like this as I scroll down ICD codes are on the left and there were in dots there but you can sort of force it
+      
+    
+say it has to be padded with a zero or something like that once we enforce this I'm sorry we will
+      
+    
+not add from a library perspective offer any transformation for people to put in their version they need whoever's using
+      
+    
+our code needs to convert their icd-9 or icd-10 codes into a format like this that's on them to do it's too much
+      
+    
+it's just isn't it to a documentation is it to make sure that they do it these are the icd-10 codes oh these are the
+      
+    
+icd-9 codes same thing and you'll notice of course that there's zero justified in where to to to disambiguate the
+      
+    
+differences between 323 and 0 0 323 based on some dot that was there
+      
+    
+previously I believe this one is actually going to be like this like something like that the real issue is
+      
+    
+that there there is the reason they need to do it like this is like there is no like look at oh three eight there is no
+      
+    
+oh 38.7 that's an invalid code okay right so they're very like judicious
+      
+    
+about so it's not that they're trying to make them all the same length it's that they're like oh 38.4 nine it's a code
+      
+    
+Oh 38.5 is not a code it's actually a valid and then oh three 8.4 oh is
+      
+    
+different from oh three and four yes well then what that means is that's
+      
+    
+really what's going on it's yes it's a hierarchy yeah so but we're not gonna we're not gonna tell them oh you can put
+      
+    
+your godson and we'll figure it out they have to follow this format they have to it's too much for us to do it and people
+      
+    
+should know how to do it and in fact I guarantee you they did created the icd-9 grammar and tense grammar specification
+      
+    
+with the padding's on the left in order to account for it if we're vectorizing
+      
+    
+these these hierarchies into linear strings like this so yeah so this file
+      
+    
+right here which was included as part of the download has to be imported like this previous to running this thing and
+      
+    
+then you have somewhere floating around it's right here it's that one was the hardest thing for me to figure out if
+      
+    
+you once you import it there is a hard-coded lot libname called library
+      
+    
+which it will look in there and it something called formats dot sass it
+      
+    
+will use that format to look up that format right there okay that took me a long time because whenever I do
+      
+    
+programming languages I'm always looks concerted out of context in scope where did it context in scope like you asked
+      
+    
+where does this diet come from where did this diag type come from I could answer all of those questions for the longest time except for these formats I was like
+      
+    
+where the hell are these formats coming from yeah well it turns out it's if you have a lip name called library which is
+      
+    
+just a folder it's and if you have a formats in it that will be where sass looks for those formats so it'd be a
+      
+    
+long time to figure that out okay so repeating here this what we did here is
+      
+    
+we such a macro substituted this thing in here and then there was a so this one was what why to whatever or whatever it
+      
+    
+is a key it is a key in a kind of a hash table so this is the key I'm sorry this
+      
+    
+is the key and this is kind of like the name of the hash table foot turns things in is the one that does the turn things
+      
+    
+into characters but when you use it with a format it's actually like a hash table lookup left just says hey this is a new
+      
+    
+variable we haven't introduced into our scope what is its length well its length is the same length as what was in here that's all it's doing
+      
+    
+because lengths matter in SAS input then turns a character into a numeric and so
+      
+    
+it says turn this so if we put in a diagnosis of what would it be a
+      
+    
+diagnosis here a diagnosis would be two five zero whatever then the output would
+      
+    
+be I actually had it over here then the output would be if you input with zero two zero five the output is 1.5 which is
+      
+    
+the code category yeah and that code category let's go right back here is we're gonna turn it into the numeric it
+      
+    
+has 4 5 0.0 yeah well there you don't
+      
+    
+even need to put dots or the dot here means that there is nothing after it's just an integer so that becomes what's called input diagnosis which you can see
+      
+    
+right here this is the ultimate thing to do is this so now we have an array of code categories and we say the array at
+      
+    
+location 1 1 5 is assigned to equal to 1
+      
+    
+which is another way of saying 1 1 5 is true yeah it's kind of like a bit mask
+      
+    
+that's really all this is so see is him is a list of all the code categories
+      
+    
+that this patient has yeah and remember this C gets retained every single time
+      
+    
+for the loop because because I told it
+      
+    
+to retain all of its variables here because we're retaining CC 1 through CC 201 and these are the elements of C then
+      
+    
+they are implicitly being retained so for every diagnosis we are building up this this C array ones indicate you have
+      
+    
+this code category zeros because remember we started it by 0 by zeroing it out the very first time we don't know
+      
+    
+any code categories because this person probably isn't it doesn't have any diagnosis yet now we're building them all up and this thing goes through the
+      
+    
+loop may we keep on building them up keep on building it up that means if you have several diagnoses different diagnoses which map to the same code
+      
+    
+category that information is lost because that code category will just get the one right so that's one way in which
+      
+    
+we in which we quote lose information but that's the point of of categorizing categorizing creates larger scale grains
+      
+    
+so that we lose information on purpose institution we do this so that the identified CC which is IND it's greater
+      
+    
+than or equal to one which they all would be greater than wants they're all like are you talking about this right here yeah yep and then if that is less
+      
+    
+than or equal to the total amount of CCS which always would be the only reason they do that is because they create this
+      
+    
+at the top so this is a way of resetting your CC variable every single time to
+      
+    
+initialize it you set it greater than that which is that is always is greater than 201 yeah and it can be that in the
+      
+    
+editing you can set it equal to negative one so the by by setting its outside
+      
+    
+less than one and greater than 201 by being either 9999 or negative 1.0 we're essentially saying don't do anything
+      
+    
+with it and there's like what this makes you think of is there's a cool pandas function mm-hmm so num num eyes so that
+      
+    
+the C sees that a patient has would be disliked of a long array and pandas and
+      
+    
+numpy allow you to functionally convert these higher rate of audience
+      
+    
+yep that's a map function yeah exactly yeah it's it's um it's a map Combinator which is you begin to see as you do
+      
+    
+different programming languages the the abstraction that matters and in that case what you're doing and in fact you
+      
+    
+can clean awfully well that's what that's what it well the data step is that remember the data step is the thing
+      
+    
+that's being iterated on on top it's like the Select the closure that's being iterated on top of the overall structure
+      
+    
+it just occurs that there is another array within it so some you have a map within an applicant map so that's the
+      
+    
+bulk of what we're doing is there right now there's some editing actually let me let me point out that there there's some
+      
+    
+subtleties here notice this thing called primary assignment and duplicate assignment the reason for that it took
+      
+    
+me a while to figure that out is it's not a one-to-one relationship I'm sorry
+      
+    
+a many to one relationship between diagnosis codes and code categories it's
+      
+    
+a many to many relationship so I'll show you an example you see this right here
+      
+    
+we're seeing the diagnosis code three five seven two can be both a category 18 and a category seven or five of them so
+      
+    
+that is the difference between that here's our primary assignment and then here's a duplicate assignment I'm sorry
+      
+    
+there are two and then here's a secondary assignment in the case of
+      
+    
+icd-10 and I'll show you right here you will right here you will see I guess by
+      
+    
+CD tens are allowed to assign to three I do so remember I was asking you a couple
+      
+    
+weeks ago what that D means that means it's a duplicate so it creates a many-to-many relationship yeah which is
+      
+    
+interesting but potentially that stuff gets fleshed out as part of them edit so
+      
+    
+that's the last thing I want to talk about in this section right here so we the the bulk of it is just a look up to
+      
+    
+say this diagnosis becomes this code category okay but at the very top there's this thing called edit which is
+      
+    
+a special set of code that does demographics and age that it's based on
+      
+    
+certain types of codes and this one is going to be a little problematic maybe some of this stuff we will not be able
+      
+    
+to get done yet let me show you what it looks like over here is
+      
+    
+the editing for I think icd-10 codes most of it's easy if female and this
+      
+    
+icd-10 is either one of these then our code categories 48 yeah these are just one-off edits otherwise do this it's
+      
+    
+this stuff that's going to be that's opaque this stuff says if I have an
+      
+    
+icd-10 code like this then use this remember this is look this is like a lookup this is like a hash table lookup
+      
+    
+so I have our icd-10 code is whatever it is let's say 233 then using this format
+      
+    
+look up some sort of special age thing and then using that sort of some sort of special age thing there is an upper
+      
+    
+limit and a lower limit in which that icd-10 code applies so for each therefore each icd-10 code
+      
+    
+there is an upper there's a lower limit and an upper limit for their age to apply otherwise it gets narrowed out to
+      
+    
+a one which means it's a side which means that code category is not set the
+      
+    
+reason why this is and then we then we use that right here to to pull out that
+      
+    
+value okay the reason why this is problematic is this one hasn't been exposed the CMS guys we're very nice
+      
+    
+about exposing the the formats I mean like the crosswalks past text files here
+      
+    
+but they have not exposed the age limit in age I don't know what these are there
+      
+    
+is no text file that explains these things it's all captured in that binary file let me let me repeat that for the
+      
+    
+crosswalks yeah which we saw over here which which had this put they they were
+      
+    
+kind enough to have created a separate file saying Oh inside that format file which is a transport file which is a pain in the
+      
+    
+ass here here are what's in those that that crosswalk you don't actually have
+      
+    
+to open up it's literally as if here our icd-10 s - yeah code categories are icd-9 StuCo categories in in the case of
+      
+    
+in the case though of the upper and
+      
+    
+lower age limit cur icd-10 code we that's captured in a format file a
+      
+    
+binary transport file but he's not in a separate text file so I don't know what those are so per icd-10 inferred icd-9
+      
+    
+code there upper and lower a limits that matter and there is no way for me to know them unless I write some
+      
+    
+SAS code to iterate through every icd-9 in every icd-10 and print out those upper and lower ages to a separate file
+      
+    
+then I can use that to bring into the Python code yeah yeah that's that's what I will do eventually but it's just extra
+      
+    
+yeah because you have to open it is that age sex PG x ass right no no it's not that age sex that's a
+      
+    
+separate thing altogether this is a format right here in that format and this format right here are captured in
+      
+    
+this format SAS right the way the coefficients work yes but the coefficients are in a separate transport file okay there are two transport files
+      
+    
+they make that clear over here there is a transport file that captures the coefficients yeah and then there is
+      
+    
+a transport file that that captures the format's yeah I can get the coefficients
+      
+    
+easily because I've imported the code I've been picked for the coefficients yeah which allows me to do this which allows me to go to SAS code and click on
+      
+    
+it and then I can see every single coefficient right and so I could just say save this as a CSV but format seep
+      
+    
+into formats because formats you can't actually view yeah amania let's see a few files tix what
+      
+    
+happens there like kill it I think I just killed it yeah I should have done that anyways yeah that's that's what it
+      
+    
+is so you can see there are H so there are categories of 0 newborn 1 pediatrics and aged upper lower limit it's okay I
+      
+    
+need to write SAS code in order to extract that stuff out great yeah so
+      
+    
+just to repeat we were here going through what happens every single time we go through and what it is is well we
+      
+    
+we do some edits and then we assign some cost categories and that's done through every single time sure now finally if
+      
+    
+it's the last record again we're an implicit for loop so now let's do something this is all the stuff that
+      
+    
+happens on the last record now that we've created a array per beneficiary of
+      
+    
+all the code categories that they have we're going to do multiple things and they actually spend it very well we're
+      
+    
+gonna create demographic variables we're gonna create HCC we're gonna create a cc interaction variables HCC t disability
+      
+    
+variables yeah and then we're gonna run all three scores on this person yeah so
+      
+    
+remember we were talking about that yesterday all three of them are running doesn't match it's up to you to decide is this person an institutional patient is this person
+      
+    
+anyone yes yes exactly we're not trying to figure out before they go in we just calculate the scores
+      
+    
+say if this is a new enrollee and you can do it that way so for now this is the last thing what we do here so again
+      
+    
+they're their code comments explain it would create demographic variables that's this right here the age sex macro
+      
+    
+yeah the age sex macro literally does one of two things it takes your age and puts you into one of these buckets yeah
+      
+    
+so if you're if you're age six and you're female you're gonna fall into this book it will also put you into this
+      
+    
+book because it doesn't know if you're a new enrollee or not and the reason these these buckets are different from new and
+      
+    
+Roly buckets is the institutional and the community is the same they have a
+      
+    
+sixty to sixty four bucket whereas the new enrollee bucket breaks out 65 66 67 68 it's a new enrollee probably there's
+      
+    
+a distinction for each yet you're there
+      
+    
+we're getting it so the wreck that you read in is not very much is it
+      
+    
+absolutely is the original reason for entitlement is you well it's actually
+      
+    
+using this file right here you can see right down here the original reason for
+      
+    
+entitlement is not equal to zero and they actually explain what the original echoes up there's a for what's
+      
+    
+called in statistics is called a dummy variable you can call it you can call it an indicator variable but it really has
+      
+    
+four valuables thank you old age disability in stage renal disease or both disability and in stage renal
+      
+    
+disease so if that occurs if if you are 64 and your original reason for
+      
+    
+entitlement is not old age we're going to we're gonna say you fall into one bucket I don't know why they do this what they do so they're putting you into
+      
+    
+oh yeah right here you either it's a little bit redundant see this 60 to 64 no no I don't know why
+      
+    
+they do it 1 2 3 4 yeah I'm not exactly sure why but it all that all it does is basically
+      
+    
+puts you into another bucket so no no they the reason they do that go down to that line mm-hmm they're putting you
+      
+    
+into a bucket 5 or inch bucket 6 right because you can't be a new enrollee
+      
+    
+over mmm so you can't be you can't be like 68
+      
+    
+gotcha it has to do with that and they know what it's an edge condition it's an edge condition around the age 64 yeah
+      
+    
+because this is bucket five and six and bucket five and six you can see is one two three four five and six right so
+      
+    
+this is the edge condition right here and if yeah I I could sit here and think
+      
+    
+about for another five minutes to figure it out but just as we did before there were there are some tricks here we've created
+      
+    
+two arrays called cell and new enrollee cell that have these elements in them and all of this is that garbage SAS
+      
+    
+stuff in order to just say assign something this is another way of doing a dictionary but this is reverse this is
+      
+    
+putting you into addiction truth it's just there's but it's garbage you know and so that's what it's doing if you're
+      
+    
+female and you're between the ages of 0 and 34 then you belong in this bucket and then we put that book it into cell
+      
+    
+one in that book it is female  we've we've given you the value one yep
+      
+    
+no no no we given you the value one you see what's going on there we're saying
+      
+    
+if age sex let's say that was an eight if age sex is equal to eight if feet is
+      
+    
+equal to eight this is a boolean comparison and that turns it into a 1 yeah so ultimately everything that gets
+      
+    
+set in to sell one through 24 are either zeros or ones yeah that took me a while whenever you see that this is a boolean
+      
+    
+comparison that it's turned into a one yeah same thing happens here with the new enrollment cell and so I said this
+      
+    
+age sex thing is doing two things it's doing putting you into buckets age age sex buckets for both regular and for new
+      
+    
+enrollee and it's doing one more thing and it's this right here it's saying are you disabled or are you originally
+      
+    
+disabled and this is based on this o rec thing that was passed in for each individual as part of the input that's
+      
+    
+all okay so again age sex variable sets these things and in the end these are values to say the linear regression okay
+      
+    
+so to repeat we're back in our main code here our main code is doing the last time so we've created now age sex
+      
+    
+demographic buckets and originally disabled so the first thing we do the second thing we do is do what are called regular
+      
+    
+interactions which are just are you disabled along with are you on Medicaid along with your age with your sex not
+      
+    
+age sex yeah so this stuff took me a while to figure out I thought there was some sort of numeric calculations going
+      
+    
+on here but this is all boolean algebra that's all it is MMK it is either a 0 or 1 sex equals to
+      
+    
+2 is a 0 or 1 disabled is a 0 or 1 so if it's a 1 1 minus 1 becomes false so if
+      
+    
+your Medicaid female age that's because your Medicaid won you're sexist 2 that means you're female and if your age is
+      
+    
+separate from disabled so you are not disabled 1 minus if you are disabled I'm sorry I have to look what it does I guess if
+      
+    
+you're just disabled as one that means you're not disabled if you disabled to 0 it means you are disabled then it says you're a female age and so all of this
+      
+    
+stuff is just trickery because sass doesn't have an inherent boolean type and we're using what are called
+      
+    
+indicator variables or dummy variables and multiplication to do to to coerce
+      
+    
+these things so Medicaid female age is either 1 or 0 Medicaid female disabled if this one is 1 then this one by
+      
+    
+mathematics has to be 0 and so that's what we're doing we're creating interactions and that's just a toy
+      
+    
+deterrent for saying is this person both Medicaid Fino and age is this person Medicaid female and disabled all the way
+      
+    
+down here so these are the normal interactions based on whether it's Medicaid or disabled and now we have new
+      
+    
+enrollee interactions these apply for community and institutional regression these apply for new enrollees they're a
+      
+    
+little bit more complicated female between the age of 65 and their new
+      
+    
+enrollee Medicaid is whatever and so that's all these things are doing is some sort of special code that gives
+      
+    
+these things here zeros or ones now remember I said maybe about 10 minutes ago that everything in sass that's on the
+      
+    
+left hand of an equal sign is implicit is implicitly going to be in the output data set so these all become columns in
+      
+    
+our output results and they they're all going to be used in our scoring too that's probably a more important thing
+      
+    
+but they're also going to be caught in the output yeah so when we talk about the 2017
+      
+    
+software
+      
+    
+just this is where it this is where it will change a lot yeah this is where
+      
+    
+changes oh that's a that's a very important thing as I was reading through this code I was trying to understand what are the what are the things that
+      
+    
+are probably going to be constant they're probably gonna be consistent and then what are the things like this that
+      
+    
+are gonna change as the as the years go on and they'll publish new things so I think a how you roll up code categories
+      
+    
+is something that's gonna be changed but also these edits and these interactions okay so let's just talk about this
+      
+    
+briefly mmm they are doing the exact same thing they're just doing it do more so instead
+      
+    
+of new and Roley and and wooly they're doing actually or instead of doing age
+      
+    
+and then the new enrollee buckets they're actually doing originally disabled new and Roley mm-hmm
+      
+    
+not originally disabled oh and Roley then they're doing not originally
+      
+    
+disabled Medicaid enrollees they're doing out here - yeah it's just they're doing that with age buckets so instead
+      
+    
+of two sets of full age buckets like go to go back to each sex age sex macro in
+      
+    
+age sex macro you have you have two sets of buckets two sets of buckets yeah in
+      
+    
+the 2017 version there are one two three you know they break it out for five sets
+      
+    
+of buckets I think that's probably very close to what they're doing here by multiplying it out notice these buckets here are rigidly disabled but yeah yeah
+      
+    
+there are so many different ways of combining these things and unfortunately because of all these things the proper way to model this and software is to
+      
+    
+make that into an object and these attributes off of it what they're doing though is because they know it's the input to a linear regression they're
+      
+    
+treating these as all separate variables with a coefficient and so you get this massive explosion a combination you know
+      
+    
+combinations of three interacting variables or four interacting variables you can get an explosion of these variables into a linear regression yeah
+      
+    
+so then they then the other thing is the so they they don't have as many so they
+      
+    
+don't have these as many of them we they're just doing full buckets across each category they're saying Medicaid
+      
+    
+buckets new and only buckets doctor like all the way across because they're populating more scores hmm so they have
+      
+    
+just creating more variables these variables for this for these variables for this one I'll just go through all of them but what they have more of which is
+      
+    
+we're going to next is they have a ton of actually it's not as many they have
+      
+    
+more of the disease interactions which are lower down yeah you'll see that it Z's introductions coming up yeah so far this has been only regular interactions
+      
+    
+based on age and demography yes a lot of these have been eliminated because they just start doing just everything
+      
+    
+all right so again create the regular age sex date buckets create some basic
+      
+    
+interactions with Medicaid and disabled now so notice here it says give n1 and n2 well I was like why did we have to
+      
+    
+have this because we were already protected by n1 but this says what this line is saying here is if there is a diagnosis if there is no diagnosis then then we're
+      
+    
+going to have to at the very end here just say where is it sorry there are no diagnosis then then our HTC's are zero
+      
+    
+so that means we have beneficiaries who have they still matter we can still give them a risks were and we so in case
+      
+    
+there are no diagnoses this match is up here then there HTC's are all 0 but if they if there isn't in - then do this
+      
+    
+yeah okay so same thing was occurring oh one more thing up here you know is that some yeah that's because look these
+      
+    
+things truth in SAS as anything but zero
+      
+    
+so if any one of these things is one then they're all one so could you could actually sum this up and get six so we
+      
+    
+just we just didn't yeah which just becomes true so 5 + 1 + 1 is true yeah
+      
+    
+so now we're now we're going to do interactions with diagnoses so we're
+      
+    
+gonna say max HCC how could I skipped over something how did we get this HCC well let's scroll back to the top where
+      
+    
+did we in fact if these HD sees oh right there yeah you do the higher lock if we have that define invoke higher mac so
+      
+    
+higher mac is here higher mac does this first it sets the HCC
+      
+    
+arrey to the same as same so if we had one in the third position and a one in
+      
+    
+the 15th position of our code categories the HTC will have that then and now I finally understand what they mean by
+      
+    
+hierarchical ization then it says if you have an 8 then 0 out 9 10 11 12 because
+      
+    
+8 is the more severe version of neoplasm - all right so I didn't understand what
+      
+    
+hierarchical ization meant until now so that that is actually coming here from this set 0 is this so if it comes in
+      
+    
+here and higher is 9 10 11 12 if HCC at that that value H TCA is equal
+      
+    
+to 1 then for HTC's from 9 10 11 12 to make those equal to zero
+      
+    
+yeah it's pretty like I said before the code is but not because of the programmers yeah the code is
+      
+    
+because it's SAS these are excellent developers whoever wrote this they're good SATs developers I mean they've done
+      
+    
+is they've taken it as far as you can but it's very very early and that's all it's doing it but also notice you have
+      
+    
+to do it in order because first first we have 8 and then 0 9 10 11 12 if I were to cut this here and put this
+      
+    
+above it would it would create a bug right so they have done it with a specific order so if you have AIDS
+      
+    
+you're out nine ten eleven twelve if you if you haven't zeroed out nine ten eleven twelve but you have nine then eliminate ten eleven twelve this creates
+      
+    
+this says get rid of the CCS and set these to HTC's I'm gathering you knew this very well I this this was an easier
+      
+    
+person yeah I didn't understand it at first but that's all that's going so back back here we run that thing and now
+      
+    
+these are very high level interactions I was reading the HHS spec on it and these
+      
+    
+are called like severe I forget what they're called severe something in HHS there are eight of them here there there
+      
+    
+are 10 I believe and Max again is just literally so if if there is zero zero
+      
+    
+one one one and make it one so if you have any of these set then you have cancer if you have any of these set then
+      
+    
+you have diabetes and the reason these matter right here is because we're gonna use them in interactions again this is
+      
+    
+just boolean algebra now you see the multiply and you think oh no there's something really numeric going on no all we're saying is cancer immune is at a
+      
+    
+one or zero diabetes CHF is carboys CHF
+      
+    
+shoot I always forget what that one knows congestive heart failure yeah
+      
+    
+coronary obstruction obstructive pulmonary disease or COPD yeah so if you have both of these that's because one
+      
+    
+times one is one right and then we do the same thing now everything in this block is interactions
+      
+    
+with diagnosis and HTC's and all of these things on the left hand of the equals our output variables in all of
+      
+    
+these things will be fed into our our scoring linear regression model okay so
+      
+    
+yeah 2017 as a couple more but nothing but there's new ones for substance abuse
+      
+    
+and respiratory dependence so I saw such and some P was going into the HHS stuff
+      
+    
+but it's also going to the Medicare stuff too okay that's cool yeah and so they keep on creating more and more of these things all of these ultimately are
+      
+    
+as I said anything on the left end of the equal sign is an output column and
+      
+    
+then once that's all done we're done now score them and we're gonna score three of them we're gonna score score
+      
+    
+community we're gonna score score institutional and we're gonna score new enrollee it's worth pointing out something right here see the score Mac
+      
+    
+it this is literally replaced with the the with the score macro which is right
+      
+    
+over here which will be score bar this
+      
+    
+are the the inputs that matter for community these are the inputs that
+      
+    
+matter for institutional and these are the ones that it's worth looking at these here the community rig all the way
+      
+    
+at the top has been set at age sex female aged all plus all these things
+      
+    
+interaction variables and then all of our HTC's institutional reg is age sex
+      
+    
+Medicaid originally disabled interaction I variable 's and our love our each disease and here's something interesting
+      
+    
+I didn't get it at first but now it makes sense new and roll we're edge if you look at those it's pretty much the same except
+      
+    
+it doesn't have a HCC's they have no history because they have no history so when we do a linear regression score on
+      
+    
+new enrollees it's literally on the only thing we know about them which is their age and their sex and their Medicaid
+      
+    
+because they are absolutely new enrollees no history I was I was so very happy I patted myself on the back that I finally
+      
+    
+but again so this the second parameter is what is gonna be used to score notice
+      :01
+    
+this thing right here third parameter C prep which is coefficient prefix so C coefficients
+      :07
+    
+yep so in since underscore and any underscore so in the score in the score
+      :14
+    
+bar right over here what we're going to do is here's our list the things that matter input here are the coefficients
+      :20
+    
+we literally multiply to get it this is probably one of the only locations in all the SAS code where this multiplication is being used for non
+      :26
+    
+boolean algebra this is the linear regression this says here's our here's
+      :32
+    
+our input our input is our list our list was either was age sex variables for community and assistive plus all those
+      :38
+    
+interactions every single thing in here is going to be a one or a zero yep that's the clever thing that they do
+      :44
+    
+so there is this is this is a linear regression that basically uses indicator of categorical dummy variables and then
+      :50
+    
+we're gonna use C prep so C prep will be become either c e-- underscore or AI NS underscore and as i showed you before
+      :57
+    
+when i loaded those coefficients upload them again you can see so that is about c e fo this is a massive single row of
+      :05
+    
+every single so what this does here is it scans for time see know maybe i don't
+      :16
+    
+quite understand that times oh yeah yeah that becomes c e scan is a mackerel so
+      :21
+    
+we're scanning the our list for that thing so we'll actually put in yeah yeah yeah
+      :27
+    
+yeah sorry where is it we're close right there so we'll actually put in HC c it's
+      :33
+    
+a macro one eight eight and it's another way of doing those things can you go back to the coefficient on yeah can you
+      :38
+    
+go to the where was the columns all the
+      :43
+    
+stuff you see right here these are all the interactions possible whether they be non diagnosis interactions like this
+      :50
+    
+or whether they be diagnosed these interactions like this so one of the one of the things I'm looking for that we
+      :55
+    
+haven't found yet he's the C C's where are the CC labels
+      :00
+    
+there are not here right they are no CC labels you have to find this easy that's
+      :06
+    
+that's that's a that's not in this Ascot what we'll have to pull it down from somewhere else there there are HDC
+      :11
+    
+labels but not CC labels don't know where the CC labels are because one of the benefits of one of them one of the
+      :18
+    
+benefits of our library is sometimes not the score but just what conditions does
+      :23
+    
+this patient have right for categorization that would probably be a one-time download of a mapping of code
+      :29
+    
+categories to their labels can we do that and someone says give me that somebody can say give you the level one
+      :34
+    
+which would be the HTC's or give me the level zero at sea season Oh and according to accordions demo they
+      :42
+    
+have that but I'm like where did they get the CC labels yeah I'm you could just write a program to restfully call
+      :49
+    
+you know those online what is what is my code category they I thought they were
+      :55
+    
+those existed like you have icd-9 s as well once you have the data you have it
+      :01
+    
+unless someone's written to a special copyright saying you can't use these again so anyways that's that's pretty
+      :08
+    
+much it and this score bar is done three times in a row one four one four and so
+      :15
+    
+this variable is being set so it's it starts off at zero and let's go back here so score community starts at 0 and
+      :22
+    
+then iteratively is either 1 times 0 1 or 0 times that coefficient so the things that have the things that have a
+      :29
+    
+1 on them are contribute that coefficients worth of inputs to the
+      :35
+    
+finals to the final score value and then at the very end we are left with school
+      :40
+    
+new score new enrollees score institutional and then they have this weird thing called this normalize the score there's this thing called DF I
+      :47
+    
+have it set automatically to be 1 but it is a normalization factor I couldn't see
+      :53
+    
+any any documentation on what that was
+      :00
+    
+yeah so it's scaling all these things to 100k but currently you are allowed to
+      :05
+    
+when you invoke it you could set it to something else like I could say DF is equal to 0.5 that was equal if I want to
+      :15
+    
+yes I don't know what that means though but it's there and it goes to show you there are a lot of things about
+      :21
+    
+this calling this is the users responsibility so the user can can
+      :26
+    
+choose I want more things or less things to be reported out I want to I want to do edits where I don't want to do edits
+      :32
+    
+where yeah or here's where I was telling you yesterday we were doing something wrong
+      :37
+    
+look at this this is being run as a the 1st of February 2016 but this was data from 2008 and 2009 so we should have
+      :45
+    
+said 2010 right yeah because then they would have been 65 as of 2010 not and
+      :53
+    
+not 70 as of 2016 but that's not that's not the problem with the dates the problem with the dates was we fed them
+      :00
+    
+this data if you look here at their beneficiary file see their date of birth 192 1923 0 5 0 1 that's year month date
+      :08
+    
+format that is not the format that SAS wants SAS wants the number of days since January 1st 1960 so I have to convert it
+      :16
+    
+into that before it will actually yes yes there are some there are some things
+      :22
+    
+like this right here if you do this if you regimen in this format and then put that D out there it will convert it into
+      :29
+    
+a into the number of days since January 1st 1960 it's a very different format so
+      :36
+    
+that's that was I actually missed that but it was actually here they did say this right here date of birth
+      :42
+    
+SAS date format you have to look up what's a state format is and again it's a state format remember SAS only has two
+      :48
+    
+types numeric in char and so date is numeric and it's the number of days since January 1st 1960 not 1970 as in
+      :57
+    
+like UNIX epoch 1960 again showing you how old SAS is that they chose to make it that I think SAS was first written
+      :03
+    
+about 1969 and really that's it at the
+      :08
+    
+end of it we've scored it this is the this is the end of our data step remember data step is pretty much all of the errors in SAS and now that we're
+      :14
+    
+done we print it out we create an output file and there are other things I hear
+      :20
+    
+like the labels but you saw that automatically label as a way of attaching these things it creates it puts metadata associated with each
+      :26
+    
+variable it's a it's a particular label
+      :31
+    
+and they keep on using that word it's a particular care eristic of wait house asking us things datasets have metadata associated with
+      :38
+    
+each column and in this case you can give it quote a label which is used in reporting out things that you were asking
+      :43
+    
+we have labels for the HECS we don't have labels for the CCS and that's pretty much it unless you have any more
+      :50
+    
+questions I can stop there recording no okay oh I will keep this on let me
+      :55
+    
+show you this look so I wanted to translate this high level code that we saw here which they did a pretty good
+      :02
+    
+job comment and you I showed you how they had the three four three five three six here is what I have this is our
+      :09
+    
+Python code as a set of very high level steps what we'll do the same thing I copied there I copied their pseudo code
+      :17
+    
+in here so realistically score beneficiaries follows the same right here my worlds center right here score
+      :24
+    
+beneficiaries a beneficiary is a has a beneficiary and the beneficiary object has diagnosis it's the same thing as the
+      :30
+    
+merge in the case of Python someone will have pre created a beneficiary and all his or her associated diagnoses so we
+      :38
+    
+don't need to worry about the mechanics of emerge okay so for each beneficiary priests diagnosis and at the diagnosis this is either edit Mac nine read MX 0
+      :44
+    
+and the create the category coding notices for both of these I pass in the beneficiary and the diagnosis because
+      :49
+    
+when we edit the diagnosis we assign the code category to the beneficiary these are rolled up to the beneficiary
+      :55
+    
+label then we create demographics on the beneficiary then we create HCC because this is an object this beneficiary has
+      :01
+    
+the code category on it we create the HCC then we create the interactions then we create the disabled interactions then we score it score if you see here
+      :08
+    
+returns a triple this is fake for now this will be the community regression this will be an institutional this will be whatever and then I will I will
+      :14
+    
+return results which are the beneficiary and all of his or her diagnosis along with their scores and then those results
+      :20
+    
+I will output to to something so this is the this right here is essentially what
+      :25
+    
+was in the data step right I mean obviously it couldn't get much bigger but the pseudo Python reads so much like
+      :31
+    
+pseudo code that this is already an advantage for anyone trying to understand it right and yeah and then
+      :37
+    
+the other thing to keep in mind is just like don't so they'll need to be able to access they cook the conditions
+      :43
+    
+undergoing a tune so don't say what conditions does this beneficiate yes yeah and those conditions will be
+      :50
+    
+asked will be on the beneficiary and him/herself so they'll have the conditions and they'll have the HEC
+      :55
+    
+handles and there will be an array of all the diagnoses yeah yep okay now I
+      :00
+    
+will stop
